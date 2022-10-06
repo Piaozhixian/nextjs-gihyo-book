@@ -18,13 +18,20 @@ type ResponsiveProp<T> = {
  */
 type Responsive<T> = T | ResponsiveProp<T>
 
+// Themeの型
+type AppTheme = typeof theme
+// Themeのキーの型
+type SpaceThemeKeys = keyof typeof theme.space
+// Themeのキーの型(SpaceThemeKeys) もしくは任意の文字列('10px'など)
+type Space = SpaceThemeKeys | (string & {}) // & {}を書くとエディターの補完が効くようになる
+
 /**
  * Responsive型をCSSプロパティとその値に変換
  * @param propKey CSSプロパティ
  * @param prop Responsive型
  * @return CSSプロパティとその値(ex. background-color: white;)
  */
-function toPropValue<T>(propKey: string, prop?: Responsive<T>): string {
+function toPropValue<T>(propKey: string, prop?: Responsive<T>, theme?: AppTheme): string {
   /**
    *
    */
@@ -32,6 +39,31 @@ function toPropValue<T>(propKey: string, prop?: Responsive<T>): string {
 
 interface ContainerProps {
   flexDirection?: Responsive<string>
+  marginBottom?: Responsive<Space>
+}
+
+const Container = styled.section<ContainerProps>`
+  padding: 4em;
+  display: flex;
+  ${(props) => toPropValue('flex-direction', props.flexDirection, props.theme)}
+  ${(props) => toPropValue('margin-bottom', props.marginBottom, props.theme)}
+`
+
+const Page: NextPage = () => {
+  return (
+    <>
+    <Container flexDirection="column" marginBottom="8px">
+      {
+        /*
+        - 常に縦並びになります
+        - 下に8px(テーマ設定した二つ目の要素）のマージン
+         */}
+      <div>First item</div>
+      <div>Second item</div>
+      }
+    </Container>
+    </>
+  )
 }
 
 const Container = styled.section<ContainerProps>`
